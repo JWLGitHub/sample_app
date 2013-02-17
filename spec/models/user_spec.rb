@@ -1,8 +1,26 @@
+# == Schema Information
+#
+# Table name: users
+#
+#  id              :integer          not null, primary key
+#  name            :string(255)
+#  email           :string(255)
+#  created_at      :datetime         not null
+#  updated_at      :datetime         not null
+#  password_digest :string(255)
+#  remember_token  :string(255)
+#
+
 require 'spec_helper'
 
 describe User do
 
-    before { @user = User.new(name: "Example User", email: "user@example.com", password: "foobar", password_confirmation: "foobar") }
+    before do
+      @user = User.new(name: "Example User", 
+                       email: "user@example.com", 
+                       password: "foobar", 
+                       password_confirmation: "foobar")
+    end
 
     subject { @user }
 
@@ -24,6 +42,10 @@ describe User do
 
     describe "password_digest attribute exists" do
       it { should respond_to(:password_digest) }
+    end
+
+    describe "remember_token attribute exists" do
+      it { should respond_to(:remember_token) }
     end
 
     describe "authenticate method exists" do
@@ -123,5 +145,10 @@ describe User do
         it { should_not == user_for_invalid_password }
         specify { user_for_invalid_password.should be_false }
       end
+    end
+
+    describe "remember token" do
+      before { @user.save }
+      it { @user.remember_token.should_not be_blank }
     end        
 end
