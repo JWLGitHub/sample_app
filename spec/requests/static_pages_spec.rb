@@ -3,73 +3,98 @@ require 'spec_helper'
 
 describe "Static pages" do
 
-  subject { page }
+    subject { page }
 
-  #let(:base_title) { "Ruby on Rails Tutorial Sample App"}
-  shared_examples_for "all static pages" do
-    it { should have_selector('h1',    text: heading) }
+    #let(:base_title) { "Ruby on Rails Tutorial Sample App"}
+    shared_examples_for "all static pages" do
+        it { should have_selector('h1',    text: heading) }
 
-    it { should have_selector('title', text: full_title(page_title)) }
-  end
+        it { should have_selector('title', text: full_title(page_title)) }
+    end
 
-  describe "Home page" do
-    before { visit root_path }
+    describe "Home page" do
+        before(:each) do
+            visit(root_path)
+        end
 
-    let(:heading)    { 'Sample App' }
-    let(:page_title) { '' }
+        let(:heading)    { 'Sample App' }
+        let(:page_title) { '' }
 
-    it_should_behave_like "all static pages"
+        it_should_behave_like "all static pages"
 
-    it { should_not have_selector 'title', text: '| Home' }
-  end
+        it { should_not have_selector 'title', text: '| Home' }
 
-  describe "Help page" do
-    before { visit help_path }
+        describe "for signed-in users" do
+            let(:user) { FactoryGirl.create(:user) }
 
-    let(:heading)    { 'Help' }
-    let(:page_title) { 'Help' }
+            before(:each) do
+                FactoryGirl.create(:micropost, user: user, content: "Lorem ipsum")
+                FactoryGirl.create(:micropost, user: user, content: "Dolor sit amet")
+                sign_in(user)
+                visit(root_path)
+            end
 
-    it_should_behave_like "all static pages"
-  end
+            it "should render the user's feed" do
+                user.feed.each do |item|
+                    page.should have_selector("li##{item.id}", text: item.content)
+                end
+            end
+        end
+    end
 
-  describe "About page" do
-    before { visit about_path }
+    describe "Help page" do
+        before(:each) do
+            visit(help_path)
+        end
 
-    let(:heading)    { 'About' }
-    let(:page_title) { 'About Us' }
+        let(:heading)    { 'Help' }
+        let(:page_title) { 'Help' }
 
-    it_should_behave_like "all static pages"
-  end
+        it_should_behave_like "all static pages"
+    end
 
-  describe "Contact" do
-    before { visit contact_path }
+    describe "About page" do
+        before(:each) do
+            visit(about_path)
+        end
 
-    let(:heading)    { 'Contact' }
-    let(:page_title) { 'Contact' }
+        let(:heading)    { 'About' }
+        let(:page_title) { 'About Us' }
 
-    it_should_behave_like "all static pages"
-  end
+        it_should_behave_like "all static pages"
+    end
 
-  it "should have the right links on the layout" do
-    visit root_path
+    describe "Contact" do
+        before(:each) do
+            visit(contact_path)
+        end
 
-    click_link "Home"
-    page.should have_selector 'title', text: full_title('')
+        let(:heading)    { 'Contact' }
+        let(:page_title) { 'Contact' }
 
-    click_link "Help"
-    page.should have_selector 'title', text: full_title('Help')
+        it_should_behave_like "all static pages"
+    end
 
-    click_link "About"
-    page.should have_selector 'title', text: full_title('About Us')
+    it "should have the right links on the layout" do
+        visit(root_path)
 
-    click_link "Contact"
-    page.should have_selector 'title', text: full_title('Contact')
+        click_link("Home")
+        page.should have_selector 'title', text: full_title('')
 
-    click_link "sample app"
-    page.should have_selector 'title', text: full_title('')  
+        click_link("Help")
+        page.should have_selector 'title', text: full_title('Help')
 
-    click_link "Sign up now!"
-    page.should have_selector 'title', text: full_title('Sign up')
-  end
+        click_link("About")
+        page.should have_selector 'title', text: full_title('About Us')
+
+        click_link("Contact")
+        page.should have_selector 'title', text: full_title('Contact')
+
+        click_link("sample app")
+        page.should have_selector 'title', text: full_title('')  
+
+        click_link("Sign up now!")
+        page.should have_selector 'title', text: full_title('Sign up')
+      end
 
 end

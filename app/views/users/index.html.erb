@@ -4,7 +4,8 @@
 	All users
 </h1>
 
-<%= will_paginate %>
+#will_paginate() is assuming @users here
+<%= will_paginate() %>
 
 <ul class="users">
   	#Rails infers that @users is a list of User objects.
@@ -13,4 +14,5 @@
     <%= render @users %>
 </ul>
 
-<%= will_paginate %>
+#will_paginate() is assuming @users here
+<%= will_paginate() %>

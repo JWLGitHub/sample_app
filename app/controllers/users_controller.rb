@@ -1,8 +1,11 @@
 class UsersController < ApplicationController
-    #User MUST be Signed In to edit or update    
+    #User MUST be Signed Out to "Sign up"   
+    before_filter :signed_out_user, only: [:new, :create]
+
+    #User MUST be Signed In to List, Edit, Update or Delete   
     before_filter :signed_in_user, only: [:index, :edit, :update, :destroy]
 
-    #User CANNOT edit or update Other User(s)     
+    #User CANNOT Edit or Update Other User(s)     
     before_filter :correct_user,   only: [:edit, :update]
 
     #ONLY Admin User CAN delete   
@@ -12,6 +15,9 @@ class UsersController < ApplicationController
     def show
         #Display "Show" User page
         @user = User.find(params[:id])
+
+        #Get a "chunk/page" of User Micropost(s) - (30 by default)
+        @microposts = @user.microposts.paginate(page: params[:page])
     end
 
     def new
@@ -24,13 +30,14 @@ class UsersController < ApplicationController
         @user = User.new(params[:user])   #Create User
 
         if @user.save
-            #Valid User Saved
+            #User Save SUCCESS
             sign_in(@user)          
             flash[:success] = "Welcome to the Sample App!"
 
             #Request the "show" action
             redirect_to(@user)
         else
+            #User Save ERROR
             #Display "Sign Up" page 
             render('new')
         end
@@ -61,14 +68,19 @@ class UsersController < ApplicationController
         #Display "ALL User(s)" page
         #@users = User.all
 
-        #Display "ALL User(s)" page - one chunk at a time (30 by default)
+        #Get a "chunk/page" of User(s) - (30 by default)
         @users = User.paginate(page: params[:page])
     end
 
     def destroy
-        #Find/Delete User
-        User.find(params[:id]).destroy
-        flash[:success] = "User destroyed."
+        #Find User
+        @user = User.find(params[:id])
+
+        if !current_user?(@user)
+            #Delete User
+            User.destroy(params[:id])
+            flash[:success] = "User destroyed."
+        end
 
         #Request the "index" action
         redirect_to(users_url)
@@ -79,12 +91,11 @@ class UsersController < ApplicationController
     #-----------------------------------#
     private
 
-    def signed_in_user
-        if !signed_in?()
-            #User NOT Signed In
-            store_request_url()
-            #Request the "/signin" action
-            redirect_to(signin_url, notice: "Please sign in.")
+    def signed_out_user
+        if signed_in?()
+            #User Signed In
+            #Request the "root" action
+            redirect_to(root_path)
         end
     end
 

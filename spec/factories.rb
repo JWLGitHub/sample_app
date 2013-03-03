@@ -1,7 +1,7 @@
-# ----------------------- #
-# Create multiple User(s) #
-# ----------------------- #
 FactoryGirl.define do
+	# ----------------------- #
+	# Create multiple User(s) #
+	# ----------------------- #
     factory :user do
 	    sequence(:name)  { |n| "Person #{n}" }
 	    sequence(:email) { |n| "person_#{n}@example.com"}   
@@ -12,16 +12,22 @@ FactoryGirl.define do
 	        admin true
 	    end
 	end
-end
 
-# ------------- #
-# Create 1 User #
-# ------------- #
-#FactoryGirl.define do
-#    factory :user do
-#        name     "Michael Hartl"
-#        email    "michael@example.com"
-#        password "foobar"
-#        password_confirmation "foobar"
-#    end
-#end
+	# -------------------- #
+	# Create Specific User #
+	# -------------------- #
+	#    factory :user do
+	#        name     "Michael Hartl"
+	#        email    "michael@example.com"
+	#        password "foobar"
+	#        password_confirmation "foobar"
+	#    end	
+
+	# ------------------------- #
+	# Create Specific Micropost #
+	# ------------------------- #
+	factory :micropost do
+        content "Lorem ipsum"
+        user
+    end
+end

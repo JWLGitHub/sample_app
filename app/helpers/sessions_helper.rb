@@ -44,6 +44,15 @@ module SessionsHelper
       end
   end
 
+  def signed_in_user()
+      if !signed_in?()
+          #User NOT Signed In
+          store_request_url()
+          #Request the "/signin" action
+          redirect_to(signin_url, notice: "Please sign in.")
+      end
+  end
+
   def sign_out()
       #Unset the current_user
       self.current_user=(nil)

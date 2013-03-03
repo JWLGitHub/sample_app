@@ -6,7 +6,7 @@ describe "Authentication" do
 
     describe "signin page" do
         before(:each) do
-            visit signin_path 
+            visit(signin_path) 
         end
 
         it { should have_selector('h1',    text: 'Sign in') }
@@ -16,12 +16,12 @@ describe "Authentication" do
 
     describe "signin" do
         before(:each) do
-            visit signin_path 
+            visit(signin_path) 
         end
 
         describe "with invalid information" do
             before(:each) do
-                click_button "Sign in"
+                click_button("Sign in")
             end
 
             it { should have_selector('title', text: 'Sign in') }
@@ -30,7 +30,7 @@ describe "Authentication" do
 
             describe "after visiting another page" do
                 before(:each) do
-                    click_link "Home"
+                    click_link("Home")
                 end
 
                 it { should_not have_selector('div.alert.alert-error') }
@@ -60,10 +60,14 @@ describe "Authentication" do
 
             describe "followed by signout" do
                 before(:each) do 
-                    click_link "Sign out" 
+                    click_link("Sign out") 
                 end
 
                 it { should have_link('Sign in') }
+
+                it { should_not have_link('Profile') }
+
+                it { should_not have_link('Settings') }
             end
         end
     end
@@ -77,7 +81,7 @@ describe "Authentication" do
 
                 describe "visiting the edit page" do
                     before(:each) do
-                        visit edit_user_path(user)
+                        visit(edit_user_path(user))
                     end
 
                     it { should have_selector('title', text: 'Sign in') }
@@ -86,7 +90,7 @@ describe "Authentication" do
                 describe "submitting to the update action" do
                     before(:each) do
                         #"put" needed to replicate RESTful "update" of existing record
-                        put user_path(user)
+                        put(user_path(user))
                     end
 
                     #From the HTTP Response object
@@ -95,7 +99,7 @@ describe "Authentication" do
 
                 describe "visiting the user index" do
                     before(:each) do
-                        visit users_path
+                        visit(users_path)
                     end
 
                     it { should have_selector('title', text: 'Sign in') }
@@ -104,16 +108,33 @@ describe "Authentication" do
 
             describe "when attempting to visit a protected page" do
                 before(:each) do
-                    visit edit_user_path(user)
-                    fill_in "email",    with: user.email
-                    fill_in "password", with: user.password
-                    click_button "Sign in"
+                    visit(edit_user_path(user))
+                    sign_in(user)
                 end
 
                 describe "after signing in" do
                     it "should render the desired protected page" do
                         page.should have_selector('title', text: 'Edit user')
                     end
+                end
+            end
+
+            describe "in the Microposts controller" do
+
+                describe "submitting to the create action" do
+                    before(:each) do 
+                        post(microposts_path)
+                    end 
+
+                    specify { response.should redirect_to(signin_path) }
+                end
+
+                describe "submitting to the destroy action" do
+                    before(:each) do 
+                        delete(micropost_path(FactoryGirl.create(:micropost))) 
+                    end
+                    
+                    specify { response.should redirect_to(signin_path) }
                 end
             end
         end
@@ -149,7 +170,7 @@ describe "Authentication" do
             let(:non_admin) { FactoryGirl.create(:user) }
 
             before(:each) do
-                sign_in non_admin
+                sign_in(non_admin)
             end
 
             describe "submitting a DELETE request to the Users#destroy action" do
