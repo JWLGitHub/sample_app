@@ -122,7 +122,7 @@ describe "User pages" do
         let!(:m2) { FactoryGirl.create(:micropost, user: user, content: "Bar") }
          
       	before(:each) do
-            visit user_path(user) 
+            visit(user_path(user))
         end
 
       	it { should have_selector('h1',    text: user.name) }
@@ -136,6 +136,68 @@ describe "User pages" do
 
             it { should have_content(user.microposts.count) }
         end
+
+        describe "follow/unfollow buttons" do
+            #Create an "Other" User model object (see /spec/factories.rb)
+            let(:other_user) { FactoryGirl.create(:user) }
+
+            before(:each) do
+                sign_in(user)
+            end
+
+            describe "following a user" do
+                before(:each) do
+                    visit(user_path(other_user))
+                end
+
+                it "should increment the followed user count" do
+                    expect do
+                        click_button("Follow")
+                    end.to change(user.followed_users, :count).by(1)
+                end
+
+                it "should increment the other user's followers count" do
+                    expect do
+                        click_button("Follow")
+                    end.to change(other_user.followers, :count).by(1)
+                end
+
+                describe "toggling the button" do
+                    before(:each) do
+                        click_button("Follow")
+                    end
+
+                    it { should have_selector('input', value: 'Unfollow') }
+                end
+            end
+
+            describe "unfollowing a user" do
+                before(:each) do
+                    user.follow!(other_user)
+                    visit(user_path(other_user))
+                end
+
+                it "should decrement the followed user count" do
+                    expect do
+                        click_button("Unfollow")
+                    end.to change(user.followed_users, :count).by(-1)
+                end
+
+                it "should decrement the other user's followers count" do
+                    expect do
+                        click_button("Unfollow")
+                    end.to change(other_user.followers, :count).by(-1)
+                end
+
+                describe "toggling the button" do
+                    before(:each) do 
+                        click_button("Unfollow")
+                    end
+
+                    it { should have_selector('input', value: 'Follow') }
+                end
+            end
+        end
     end
 
     describe "edit" do
@@ -144,7 +206,7 @@ describe "User pages" do
         
         before(:each) do
             sign_in(user)
-            visit edit_user_path(user)
+            visit(edit_user_path(user))
         end
 
         describe "page" do
@@ -157,7 +219,7 @@ describe "User pages" do
 
         describe "with invalid information" do
             before(:each) do
-                click_button "Save changes"
+                click_button("Save changes")
             end
 
             it { should have_content('error') }
@@ -172,7 +234,7 @@ describe "User pages" do
                 fill_in "Email",            with: new_email
                 fill_in "Password",         with: user.password
                 fill_in "Confirm Password", with: user.password
-                click_button "Save changes"
+                click_button("Save changes")
             end
 
             it { should have_selector('title', text: new_name) }
@@ -185,4 +247,39 @@ describe "User pages" do
             specify { user.reload.email.should == new_email }
         end
     end
+
+    describe "following/followers" do
+        let(:user) { FactoryGirl.create(:user) }
+        let(:other_user) { FactoryGirl.create(:user) }
+    
+        before(:each) do
+            user.follow!(other_user)
+        end
+
+        describe "followed users" do
+            before(:each) do
+                sign_in(user)
+                visit(following_user_path(user))
+            end
+
+            it { should have_selector('title', text: full_title('Following')) }
+        
+            it { should have_selector('h3', text: 'Following') }
+        
+            it { should have_link(other_user.name, href: user_path(other_user)) }
+        end
+
+        describe "followers" do
+            before(:each) do
+                sign_in(other_user)
+                visit(followers_user_path(other_user))
+            end
+
+            it { should have_selector('title', text: full_title('Followers')) }
+            
+            it { should have_selector('h3', text: 'Followers') }
+            
+            it { should have_link(user.name, href: user_path(user)) }
+    end
+  end
 end

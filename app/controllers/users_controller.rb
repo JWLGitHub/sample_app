@@ -3,7 +3,7 @@ class UsersController < ApplicationController
     before_filter :signed_out_user, only: [:new, :create]
 
     #User MUST be Signed In to List, Edit, Update or Delete   
-    before_filter :signed_in_user, only: [:index, :edit, :update, :destroy]
+    before_filter :signed_in_user, only: [:index, :edit, :update, :destroy, :following, :followers]
 
     #User CANNOT Edit or Update Other User(s)     
     before_filter :correct_user,   only: [:edit, :update]
@@ -84,6 +84,24 @@ class UsersController < ApplicationController
 
         #Request the "index" action
         redirect_to(users_url)
+    end
+
+    def following
+        #Find User(s) You Follow
+        @title = "Following"
+        @user = User.find(params[:id])
+        @users = @user.followed_users.paginate(page: params[:page])
+        #Display "Show Follow" page
+        render('show_follow')
+    end
+
+    def followers
+        #Find User(s) Following You        
+        @title = "Followers"
+        @user = User.find(params[:id])
+        @users = @user.followers.paginate(page: params[:page])
+        #Display "Show Follow" page
+        render('show_follow')
     end
 
     #-----------------------------------#

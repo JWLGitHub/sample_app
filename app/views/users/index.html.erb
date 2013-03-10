@@ -4,15 +4,15 @@
 	All users
 </h1>
 
-#will_paginate() is assuming @users here
+<!-- will_paginate() is assuming @users here -->
 <%= will_paginate() %>
 
 <ul class="users">
-  	#Rails infers that @users is a list of User objects.
-  	#Rails automagically iterates the collections of Users
-  	#and renders each User with the "_user.html.erb" partial.
+  	<!-- Rails infers that @users is a list of User objects.      -->
+  	<!-- Rails automagically iterates the collections of Users    -->
+  	<!-- and renders each User with the "_user.html.erb" partial. -->
     <%= render @users %>
 </ul>
 
-#will_paginate() is assuming @users here
+<!-- will_paginate() is assuming @users here -->
 <%= will_paginate() %>

@@ -9,6 +9,7 @@
 #  updated_at      :datetime         not null
 #  password_digest :string(255)
 #  remember_token  :string(255)
+#  admin           :boolean          default(FALSE)
 #
 
 require 'spec_helper'
@@ -16,8 +17,8 @@ require 'spec_helper'
 describe User do
 
     before(:each) do
-      @user = User.new(name: "Example User", 
-                       email: "user@example.com", 
+      @user = User.new(name: "Test User", 
+                       email: "test@user.com", 
                        password: "foobar", 
                        password_confirmation: "foobar")
     end
@@ -62,6 +63,34 @@ describe User do
 
     describe "feed method exists" do
         it { should respond_to(:feed) }
+    end
+
+    describe "relationships attribute exists" do
+        it { should respond_to(:relationships) }
+    end
+
+    describe "followed_users attribute exists" do
+        it { should respond_to(:followed_users) }
+    end
+ 
+    describe "following? method exists" do
+        it { should respond_to(:following?) }
+    end
+
+    describe "follow! method exists" do
+        it { should respond_to(:follow!) }
+    end
+
+    describe "unfollow! method exists" do
+        it { should respond_to(:unfollow!) }
+    end
+
+    describe "reverse_relationships attribute exists" do
+        it { should respond_to(:reverse_relationships) }
+    end
+
+    describe "followers attribute exists" do
+        it { should respond_to(:followers) }
     end
 
     describe "passes ALL validations" do
@@ -184,40 +213,103 @@ describe User do
 
     describe "micropost associations" do
         before(:each)  do
+            # Save "Test" User 
             @user.save
         end
 
-        let!(:older_micropost) do 
+        let!(:older_micropost) do
+            # Create "Older" Micropost for "Test" User 
             FactoryGirl.create(:micropost, user: @user, created_at: 1.day.ago)
         end
         
         let!(:newer_micropost) do
+            # Create "Newer" Micropost for "Test" User             
             FactoryGirl.create(:micropost, user: @user, created_at: 1.hour.ago)
         end
 
         it "should have the right microposts in the right order" do
+            # "Test" User Microposts in Descending "created_at" order 
             @user.microposts.should == [newer_micropost, older_micropost]
         end
 
         it "should destroy associated microposts" do
+            # Duplicate "Test" User Microposts
             microposts = @user.microposts.dup
+
+            # Delete "Test" User
             @user.destroy
 
             microposts.each do |micropost|
+                # "Test" User Microposts Deleted 
                 Micropost.find_by_id(micropost.id).should be_nil
             end
         end
 
-        describe "status" do
+        describe "feed" do
             let(:unfollowed_post) do
+                # Create Micropost for an "UNFollowed" User
                 FactoryGirl.create(:micropost, user: FactoryGirl.create(:user))
             end
 
-            its(:feed) { should include(newer_micropost) }
+            let(:followed_user) do
+                # Create "Followed" User
+                FactoryGirl.create(:user)
+            end
 
-            its(:feed) { should include(older_micropost) }
+            before(:each) do
+                # "Test" User Follows "Followed" User
+                @user.follow!(followed_user)
 
-            its(:feed) { should_not include(unfollowed_post) }
+                # Create 3 "Followed" User Microposts
+                3.times { followed_user.microposts.create!(content: "Lorem ipsum") }
+            end
+
+            it "should include 'Newer' Micropost" do
+                @user.feed().should include(newer_micropost) 
+            end
+           
+            it "should include 'Older' Micropost" do
+                @user.feed().should include(older_micropost) 
+            end
+
+            it "shouldn't include 'UNFollowed' User Micropost" do
+                @user.feed().should_not include(unfollowed_post)
+            end
+
+            it "should include ALL 'Followed' User Microposts" do
+                followed_user.microposts.each do |micropost|
+                    @user.feed().should include(micropost)
+                end
+            end
+        end
+    end
+
+    describe "following" do
+        let(:other_user) { FactoryGirl.create(:user) }
+
+        before(:each) do
+            @user.save
+            @user.follow!(other_user)
+        end
+
+        it { should be_following(other_user) }
+
+        its(:followed_users) { should include(other_user) }
+
+        describe "followed user" do
+            subject { other_user }
+            
+            its(:followers) { should include(@user) }
+        end
+
+        describe "and unfollowing" do
+            before(:each) do
+                @user.unfollow!(other_user)
+            end
+
+            it { should_not be_following(other_user) }
+
+            its(:followed_users) { should_not include(other_user) }
         end
     end        
 end

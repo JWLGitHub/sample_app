@@ -12,7 +12,7 @@ describe "Micropost pages" do
 
   	describe "micropost creation" do
         before(:each) do
-    		    visit root_path
+    		    visit(root_path)
     	   end
 
       	describe "with invalid information" do

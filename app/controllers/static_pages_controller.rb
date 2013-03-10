@@ -5,7 +5,7 @@ class StaticPagesController < ApplicationController
             #Create a blank Micropost
           	@micropost = current_user().microposts.build
 
-            #Get a "chunk/page" of User Micropost(s) - (30 by default)
+            #Get a "chunk/page" of "Followed" User(s) Micropost(s) PLUS "Self" Micropost(s) - (30 by default)
             @feed_items = current_user().feed().paginate(page: params[:page])
         end
     end

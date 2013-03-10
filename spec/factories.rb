@@ -1,7 +1,7 @@
 FactoryGirl.define do
-	# ----------------------- #
-	# Create multiple User(s) #
-	# ----------------------- #
+	# ----------------------------------------- #
+	# Create multiple/different/unique  User(s) #
+	# ----------------------------------------- #
     factory :user do
 	    sequence(:name)  { |n| "Person #{n}" }
 	    sequence(:email) { |n| "person_#{n}@example.com"}   
