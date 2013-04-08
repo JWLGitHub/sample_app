@@ -14,6 +14,7 @@ group :development, :test do
     gem 'rspec-rails'
     gem 'guard-rspec', '0.5.5'
     gem 'annotate'
+    gem 'capistrano'
 end
 
 group :test do
@@ -31,6 +32,7 @@ end
 
 group :production do
     gem 'pg'
+    gem 'therubyracer'
 end
 
 # Gems used only for assets and not required
@@ -46,6 +48,7 @@ group :assets do
 end
 
 gem 'jquery-rails'
+gem 'execjs'
 
 # To use ActiveModel has_secure_password
 # gem 'bcrypt-ruby', '~> 3.0.0'

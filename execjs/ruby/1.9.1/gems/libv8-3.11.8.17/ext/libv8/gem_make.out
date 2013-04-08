@@ -1,0 +1,11 @@
+c:/RailsInstaller/Ruby1.9.3/bin/ruby.exe extconf.rb 
+creating Makefile
+The process cannot access the file because it is being used by another process.
+The process cannot access the file because it is being used by another process.
+The process cannot access the file because it is being used by another process.
+c:/rails_projects/sample_app/execjs/ruby/1.9.1/gems/libv8-3.11.8.17/ext/libv8/builder.rb:49:in `setup_python!': libv8 requires python 2 to be installed in order to build, but it is currently not available (RuntimeError)
+	from c:/rails_projects/sample_app/execjs/ruby/1.9.1/gems/libv8-3.11.8.17/ext/libv8/builder.rb:35:in `block in build_libv8!'
+	from c:/rails_projects/sample_app/execjs/ruby/1.9.1/gems/libv8-3.11.8.17/ext/libv8/builder.rb:34:in `chdir'
+	from c:/rails_projects/sample_app/execjs/ruby/1.9.1/gems/libv8-3.11.8.17/ext/libv8/builder.rb:34:in `build_libv8!'
+	from c:/rails_projects/sample_app/execjs/ruby/1.9.1/gems/libv8-3.11.8.17/ext/libv8/location.rb:24:in `install!'
+	from extconf.rb:7:in `<main>'
