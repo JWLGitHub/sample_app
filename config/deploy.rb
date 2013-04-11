@@ -1,16 +1,16 @@
 load "deploy/assets"
 
-set :application, "sample_app"
-set :repository,  "git@github.com:JWLGitHub/sample_app.git"
+set :application, "sample_app"                               # Application being deployed
 
 set :scm, :git # You can set :scm explicitly or Capistrano will make an intelligent guess based on known version control directory names
 # Or: `accurev`, `bzr`, `cvs`, `darcs`, `git`, `mercurial`, `perforce`, `subversion` or `none`
+set :repository,  "git@github.com:JWLGitHub/sample_app.git"  # Location of Application source code repository
 
 set :user,          "sample_app"                             # deploy user
 set :use_sudo,      false                                    # PROHIBIT "sudo" command 
 set :deploy_to,     "/home/sample_app/apps/#{application}"   # deploy path
 set :keep_releases, 5                                        # Keep last 5 deployments
-default_run_options[:shell] = '/bin/bash --login'            # Use the bash prompt to sne d commands thru
+default_run_options[:shell] = '/bin/bash --login'            # Use the bash prompt to send commands thru
 
 
 role :web, "192.168.0.34"                          # Your HTTP server, Apache/etc
