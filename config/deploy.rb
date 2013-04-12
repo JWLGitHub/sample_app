@@ -1,3 +1,7 @@
+require 'bundler/capistrano'                                 # Execute "bundle install" after deploy
+$:.unshift(File.expand_path('./lib', ENV['rvm_path']))       # Add RVM "lib" directory to the load path (represented in Ruby by $:)
+require 'rvm/capistrano'                                     # RVM/Capistrano integration
+
 load "deploy/assets"
 
 set :application, "sample_app"                               # Application being deployed
